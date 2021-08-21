@@ -16,6 +16,7 @@ Splats::Splats(){} //constructor
 #define CLOSE_DROPS 5
 #define GLOBAL_DROPS_SMALL 10
 #define GLOBAL_DROPS_LARGE 10
+#define GLOBAL_DROPS_HOLLOW 15
 #define LONG_RAYS 15
 #define SHORT_RAYS 20
 
@@ -55,7 +56,7 @@ void Splats::drawRay(int16_t cx, int16_t cy, int16_t minR, int16_t maxR, uint16_
   float a = random(720) / 720.0 * 2 * PI;
   float x = cos(a) * r;
   float y = sin(a) * r;
-  float lineWidth = random(1, 5);
+  float lineWidth = random(1, 4);
 
   drawPolarLine(cx, cy , r, a, lineWidth, color);
   
@@ -90,9 +91,19 @@ void Splats::drawSplat(int16_t cx, int16_t cy, int16_t rad, int16_t longRays, in
     drawRay(cx, cy, rad, 1.8 * rad, color);
   }
   
-  // short rays
+  // mid rays
   for (int i = 0; i < shortRays; i++) {
     drawRay(cx, cy, rad, 1.2 * rad, color);
+  }
+
+  // very short rays
+  int sector = 360 / shortRays;
+  for (int i = 0; i < 360; i += sector) {
+    float da = i * PI / 180;
+    int len = rad + random(1, 8);
+    float dx = cos(da) * len;
+    float dy = sin(da) * len;
+    display.drawLine(cx, cy, cx + dx, cy + dy, color);
   }
 
   // close drops
@@ -198,8 +209,8 @@ void Splats::drawWatchFace() { //override this method to customize how the watch
     display.print(buffer);
 
     // Hollow circles
-    for (int i = 0; i < GLOBAL_DROPS_LARGE; i++) {
-      float rad = random(2, 6);
+    for (int i = 0; i < GLOBAL_DROPS_HOLLOW; i++) {
+      float rad = random(2, 8);
       float cxi = random(D_WIDTH);
       float cyi = random(D_HEIGHT);
       display.drawCircle(cxi, cyi, rad, BG_COLOR);
