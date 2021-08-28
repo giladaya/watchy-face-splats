@@ -13,15 +13,12 @@ RTC_DATA_ATTR int ntpSyncCounter = 0;
 
 Splats::Splats(){} //constructor
 
-#define CLOSE_DROPS 5
 #define GLOBAL_DROPS_SMALL 10
 #define GLOBAL_DROPS_LARGE 10
 #define GLOBAL_DROPS_HOLLOW 15
-#define LONG_RAYS 15
-#define SHORT_RAYS 20
 
-#define BG_COLOR GxEPD_WHITE
-#define FG_COLOR GxEPD_BLACK
+#define FG_COLOR GxEPD_WHITE
+#define BG_COLOR GxEPD_BLACK
 
 #define D_HEIGHT 200
 #define D_WIDTH 200
@@ -82,13 +79,13 @@ void Splats::drawRay(int16_t cx, int16_t cy, int16_t minR, int16_t maxR, uint16_
 }
 
 // Draw a whole "splat"
-void Splats::drawSplat(int16_t cx, int16_t cy, int16_t rad, int16_t longRays, int16_t shortRays, int16_t drops, uint16_t color) {
+void Splats::drawSplat(int16_t cx, int16_t cy, int16_t rad, int16_t longRays, int16_t shortRays, int16_t microRays, int16_t drops, uint16_t color) {
   // main blob
   display.fillCircle(cx, cy, rad, color);
  
   // long rays
   for (int i = 0; i < longRays; i++) {
-    drawRay(cx, cy, rad, 1.8 * rad, color);
+    drawRay(cx, cy, rad, 1.7 * rad, color);
   }
   
   // mid rays
@@ -97,7 +94,7 @@ void Splats::drawSplat(int16_t cx, int16_t cy, int16_t rad, int16_t longRays, in
   }
 
   // very short rays
-  int sector = 360 / shortRays;
+  int sector = 360 / microRays;
   for (int i = 0; i < 360; i += sector) {
     float da = i * PI / 180;
     int len = rad + random(1, 8);
@@ -152,13 +149,16 @@ void Splats::drawWatchFace() { //override this method to customize how the watch
     display.fillScreen(BG_COLOR);
 
     // main splat
-    drawSplat(D_WIDTH / 2, D_HEIGHT / 2, MAIN_SPLAT_RAD, 20, 30, 5, FG_COLOR);
+    drawSplat(D_WIDTH / 2, D_HEIGHT / 2, MAIN_SPLAT_RAD, 20, 30, 50, 5, FG_COLOR);
 
     float cx;
     float cy;
-    cx = D_WIDTH * 0.7;
-    cy = D_HEIGHT * 0.7;
-    drawSplat(cx, cy, MAIN_SPLAT_RAD / 2.0, 15, 20, 5, FG_COLOR);
+    int smallSplatRad = MAIN_SPLAT_RAD / 2.0;
+    int smallSplatPosR = random(MAIN_SPLAT_RAD - smallSplatRad + 5, MAIN_SPLAT_RAD + smallSplatRad);
+    float smallSplatPosA = random(1000) / 1000.0 * 2.0 * PI;
+    cx = D_WIDTH / 2 + smallSplatPosR * cos(smallSplatPosA); //D_WIDTH * 0.7;
+    cy = D_HEIGHT / 2 + smallSplatPosR * sin(smallSplatPosA); //D_HEIGHT * 0.7;
+    drawSplat(cx, cy, MAIN_SPLAT_RAD / 2.0, 15, 20, 20, 5, FG_COLOR);
 
     // For text positioning
     int16_t x1, y1;
@@ -171,7 +171,7 @@ void Splats::drawWatchFace() { //override this method to customize how the watch
     float angle_minuteHand  = 2.0 * PI / 60.0 * (theMinute - 15);
     mcx = D_WIDTH / 2 + MAIN_SPLAT_RAD * cos(angle_minuteHand);
     mcy = D_HEIGHT / 2 + MAIN_SPLAT_RAD * sin(angle_minuteHand);
-    drawSplat(mcx, mcy, D_WIDTH * 0.125, 15, 20, 5, BG_COLOR);
+    drawSplat(mcx, mcy, D_WIDTH * 0.125, 15, 20, 20, 5, BG_COLOR);
     
     // Global drops
     // Small drops
@@ -213,7 +213,7 @@ void Splats::drawWatchFace() { //override this method to customize how the watch
       float rad = random(2, 8);
       float cxi = random(D_WIDTH);
       float cyi = random(D_HEIGHT);
-      display.drawCircle(cxi, cyi, rad, BG_COLOR);
+      display.drawCircle(cxi, cyi, rad, GxEPD_WHITE);
     }
 
     drawBatteryIndicator();
