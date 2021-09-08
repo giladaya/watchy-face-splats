@@ -5,7 +5,7 @@
 
 #define PI 3.1415926535897932384626433832795
 
-#define LOW_VOLTAGE_THRESHOLD 3.75
+#define LOW_VOLTAGE_THRESHOLD 3.55
 
 // sync once every 6 hours
 #define NTP_SYNC_INTERVAL 6 * 60
@@ -17,8 +17,8 @@ Splats::Splats(){} //constructor
 #define GLOBAL_DROPS_LARGE 10
 #define GLOBAL_DROPS_HOLLOW 15
 
-#define FG_COLOR GxEPD_WHITE
-#define BG_COLOR GxEPD_BLACK
+#define BG_COLOR GxEPD_WHITE
+#define FG_COLOR GxEPD_BLACK
 
 #define D_HEIGHT 200
 #define D_WIDTH 200
@@ -125,8 +125,8 @@ void Splats::drawDrop(int16_t cx, int16_t cy, int16_t radius, uint16_t color){
 
 void Splats::drawBatteryIndicator() {
   if (getBatteryVoltage() < LOW_VOLTAGE_THRESHOLD){
-    display.drawRect(0, 185, 10, 15, GxEPD_BLACK);
-    display.fillRect(2, 183, 6, 2, GxEPD_BLACK);
+    display.drawRect(10, 185, 10, 15, FG_COLOR);
+    display.fillRect(12, 183, 6, 2, FG_COLOR);
   }
 }
 
